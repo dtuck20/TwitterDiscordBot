@@ -2,6 +2,7 @@ import discord
 import os
 import snscrape.modules.twitter as sntwitter
 import pandas as pd
+from replit import db
 
 my_secret = os.environ['TOKEN']
 client = discord.Client()
@@ -25,6 +26,22 @@ def get_tweets():
     tweets_df1 = tweets_df1.sort_values(by=['Datetime'], ascending=True)
     tweets_df1['Datetime'] = tweets_df1['Datetime'].dt.strftime("%Y-%m-%d %H:%M:%S")
   return tweets_df1
+
+def add_users(user):
+  if "users" in db.keys():
+    users = db["users"]
+    users.append(user)
+    db["users"] = users
+  else:
+    db["users"] = [user]
+    
+
+def delete_users(index):
+  users = db["users"]
+  if len(users) > index:
+    del users[index]
+  db["users"] = users
+
 
 
 @client.event
@@ -58,6 +75,7 @@ async def on_ready():
 async def on_message(message):
   if message.author == client.user:
     return
+
 
   if message.content.startswith('$hello'):
     await message.channel.send('Hello!')
